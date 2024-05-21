@@ -139,7 +139,7 @@ for i in range(len(nonadv_prompts)):
     print(f'adversarial prompt {i}: {adv_prompts[i]}, ', generated_text)
     
     ## prompt logits with intervened token
-    prompt_tokens_logits_list, prompt_tokens_ie_list = prompt_tokens_ie_score(model, tokenizer, nonadv_prompts[i], '-')
+    prompt_tokens_ie_list = prompt_tokens_ie_score(model, tokenizer, nonadv_prompts[i], '-')
 
     adv_prompt_responses[adv_prompts[i]] = {'response': generated_text}
     adv_prompt_responses[adv_prompts[i]]['prompt_ie_score'] = prompt_tokens_ie_list
