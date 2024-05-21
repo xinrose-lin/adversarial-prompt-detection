@@ -123,11 +123,13 @@ for i in range(len(nonadv_prompts)):
     # TODO: nonadv_prompt_responses[nonadv_prompts[i]]['prompt_logits'] = prompt_tokens_logits_list
     
     # print(nonadv_prompt_responses)
-    with open('harmful_data_w_scores.json', 'w') as json_file:
+    with open('harmful_data_w_scores_2.json', 'w') as json_file:
         json.dump(nonadv_prompt_responses, json_file, indent=4)   
 
     print('\n\n saved response')
-    
+
+
+for i in range(len(adv_prompts)):
     ### adv data ###
 
     inputs = tokenizer(adv_prompts[i], return_tensors="pt")
@@ -146,7 +148,7 @@ for i in range(len(nonadv_prompts)):
     # TODO: adv_prompt_responses[adv_prompts[i]]['prompt_logits'] = prompt_tokens_logits_list
     
     # print(adv_prompt_responses)
-    with open('adversarial_data_w_scores.json', 'w') as json_file:
+    with open('adversarial_data_w_scores_2.json', 'w') as json_file:
         json.dump(adv_prompt_responses, json_file, indent=4)  
 
     print('\n\n saved response') 
