@@ -90,8 +90,8 @@ def prompt_tokens_ie_score(model, tokenizer, prompt, intervene_token):
 
     ## record prompt indirect effect scores
     prompt_ie_list = [abs(ref_prob[1].item() - x[1].item()) for x in prompt_logits_list]
-
-    return prompt_ie_list
+    prompt_tokens_logits_list = [prompt[1].item() for prompt in prompt_logits_list]
+    return prompt_ie_list, prompt_tokens_logits_list
 
 
 ## load model 
@@ -116,11 +116,11 @@ for i in range(len(nonadv_prompts)):
     print(f'Harmful prompt {i}: {nonadv_prompts[i]}, ', generated_text)
 
     ## prompt logits with intervened token
-    prompt_tokens_ie_list = prompt_tokens_ie_score(model, tokenizer, nonadv_prompts[i], '-')
+    prompt_tokens_ie_list, prompt_tokens_logits_list = prompt_tokens_ie_score(model, tokenizer, nonadv_prompts[i], '-')
 
     nonadv_prompt_responses[nonadv_prompts[i]] = {'response': generated_text}
     nonadv_prompt_responses[nonadv_prompts[i]]['prompt_ie_score'] = prompt_tokens_ie_list
-    # TODO: nonadv_prompt_responses[nonadv_prompts[i]]['prompt_logits'] = prompt_tokens_logits_list
+    nonadv_prompt_responses[nonadv_prompts[i]]['prompt_logits'] = prompt_tokens_logits_list
     
     # print(nonadv_prompt_responses)
     with open('harmful_data_w_scores_2.json', 'w') as json_file:
@@ -141,11 +141,11 @@ for i in range(len(adv_prompts)):
     print(f'adversarial prompt {i}: {adv_prompts[i]}, ', generated_text)
     
     ## prompt logits with intervened token
-    prompt_tokens_ie_list = prompt_tokens_ie_score(model, tokenizer, nonadv_prompts[i], '-')
+    prompt_tokens_ie_list, prompt_tokens_logits_list = prompt_tokens_ie_score(model, tokenizer, nonadv_prompts[i], '-')
 
     adv_prompt_responses[adv_prompts[i]] = {'response': generated_text}
     adv_prompt_responses[adv_prompts[i]]['prompt_ie_score'] = prompt_tokens_ie_list
-    # TODO: adv_prompt_responses[adv_prompts[i]]['prompt_logits'] = prompt_tokens_logits_list
+    adv_prompt_responses[adv_prompts[i]]['prompt_logits'] = prompt_tokens_logits_list
     
     # print(adv_prompt_responses)
     with open('adversarial_data_w_scores_2.json', 'w') as json_file:
