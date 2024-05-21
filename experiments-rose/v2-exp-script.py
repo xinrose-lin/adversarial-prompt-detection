@@ -6,6 +6,7 @@ import torch
 import os
 import json
 
+### response not really necessary 
 nonadv_prompt_responses = {}
 adv_prompt_responses = {}
 
