@@ -1,34 +1,24 @@
-## VERSION 2: 
-## gather logits for more data 
+## VERSION 3: 
+## gather data for llama13b for comparison
+## TODO: run to get logits layer data
+## 
 
 from transformers import AutoTokenizer, AutoModelForCausalLM
 import torch
 import os
 import json
 
-### response not really necessary 
-nonadv_prompt_responses = {}
+data_filepath = '../data/data-llama13b.json'
+tokenizer_filepath = "/root/autodl-tmp/llama2/large/model"
+model_filepath = "/root/autodl-tmp/llama2/large/model"
+
 adv_prompt_responses = {}
+nonadv_prompt_responses = {}
 
-### LOAD DATA
-directory = '../data/Llama2-base/'
-json_files = [f for f in os.listdir(directory) if f.endswith('.json') and f.split('_')[0] == 'final']
-
-nonadv_prompts = set()
-adv_prompts = set()
-
-for file_name in json_files:
-    file_path = os.path.join(directory, file_name)
-    print(file_name)
-    with open(file_path, 'r') as file:
-        
+with open(data_filepath, 'r') as file:
         data = json.load(file)
-        adv_prompts.update([value for value in data.values()][0])
-        nonadv_prompts.update([key for key in data.keys()])
-
-adv_prompts = list(adv_prompts)
-nonadv_prompts = list(nonadv_prompts)
-
+adv_prompts = data['adv_data']
+nonadv_prompts = data['non_adv_data']
 
 ### function for next token logits 
 def predict_next_token(model, inp):
@@ -47,7 +37,7 @@ def predict_next_token(model, inp):
     out = model(**inp)["logits"]
     probs = torch.softmax(out[:, -1], dim=1)
     p, preds = torch.max(probs, dim=1)
-    return preds, p
+    return p, preds
 
 ### function for intervened prompt logits / ie score
 def prompt_tokens_ie_score(model, tokenizer, prompt, intervene_token): 
@@ -96,10 +86,10 @@ def prompt_tokens_ie_score(model, tokenizer, prompt, intervene_token):
 
 ## load model 
 tokenizer = AutoTokenizer.from_pretrained(
-    "/root/autodl-tmp/llama2/base/model", torch_dtype=torch.float16
+    tokenizer_filepath, torch_dtype=torch.float16
 )
 model = AutoModelForCausalLM.from_pretrained(
-    "/root/autodl-tmp/llama2/base/model", torch_dtype=torch.float16
+    model_filepath, torch_dtype=torch.float16
 )
 
 model.eval()
@@ -123,7 +113,7 @@ for i in range(len(nonadv_prompts)):
     nonadv_prompt_responses[nonadv_prompts[i]]['prompt_logits'] = prompt_tokens_logits_list
     
     # print(nonadv_prompt_responses)
-    with open('harmful_data_w_scores_2.json', 'w') as json_file:
+    with open('nonadv_data_w_scores_3.json', 'w') as json_file:
         json.dump(nonadv_prompt_responses, json_file, indent=4)   
 
     print('\n\n saved response')
@@ -148,7 +138,7 @@ for i in range(len(adv_prompts)):
     adv_prompt_responses[adv_prompts[i]]['prompt_logits'] = prompt_tokens_logits_list
     
     # print(adv_prompt_responses)
-    with open('adversarial_data_w_scores_2.json', 'w') as json_file:
+    with open('adv_data_w_scores_3.json', 'w') as json_file:
         json.dump(adv_prompt_responses, json_file, indent=4)  
 
     print('\n\n saved response') 
