@@ -1,5 +1,4 @@
-## VERSION 3: 
-## gather data for llama13b for comparison
+## VERSION 3: gather data for llama13b for comparison
 ## TODO: run to get logits layer data
 ## 
 
@@ -17,7 +16,7 @@ nonadv_prompt_responses = {}
 
 with open(data_filepath, 'r') as file:
         data = json.load(file)
-adv_prompts = data['adv_data']
+adv_prompts = data['adv_data'][:50]
 nonadv_prompts = data['non_adv_data']
 
 ### function for next token logits 
