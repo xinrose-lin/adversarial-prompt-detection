@@ -85,10 +85,12 @@ def prompt_tokens_ie_score(model, tokenizer, prompt, intervene_token):
 
 ## load model 
 tokenizer = AutoTokenizer.from_pretrained(
-    tokenizer_filepath, torch_dtype=torch.float16, device_map="auto"
+    tokenizer_filepath, torch_dtype=torch.float16
+    # device_map="auto"
 )
 model = AutoModelForCausalLM.from_pretrained(
-    model_filepath, torch_dtype=torch.float16, device_map="auto"
+    model_filepath, torch_dtype=torch.float16
+    # device_map="auto"
 )
 
 model.eval()
@@ -132,7 +134,7 @@ for i in range(len(adv_prompts)):
     ## prompt logits with intervened token
     prompt_tokens_ie_list, prompt_tokens_logits_list = prompt_tokens_ie_score(model, tokenizer, adv_prompts[i], '-')
 
-    adv_prompt_responses[adv_prompts[i]] = {'response': generated_text}
+    adv_prompt_responses[adv_prompts[i]] = {'response': generated_text[:100]}
     adv_prompt_responses[adv_prompts[i]]['prompt_ie_score'] = prompt_tokens_ie_list
     adv_prompt_responses[adv_prompts[i]]['prompt_logits'] = prompt_tokens_logits_list
     
