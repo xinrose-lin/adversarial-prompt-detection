@@ -85,16 +85,17 @@ def prompt_tokens_ie_score(model, tokenizer, prompt, intervene_token):
 
 ## load model 
 tokenizer = AutoTokenizer.from_pretrained(
-    tokenizer_filepath, torch_dtype=torch.float16
-    # device_map="auto"
+    tokenizer_filepath, torch_dtype=torch.float16, 
+    device_map="auto"
 )
 model = AutoModelForCausalLM.from_pretrained(
-    model_filepath, torch_dtype=torch.float16
-    # device_map="auto"
+    model_filepath, torch_dtype=torch.float16, 
+    device_map="auto"
 )
 
 model.eval()
-model.to("cuda")
+# model.half()
+# model.to("cuda")
 
 # for i in range(len(nonadv_prompts)):
     
