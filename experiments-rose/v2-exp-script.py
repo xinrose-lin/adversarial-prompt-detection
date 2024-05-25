@@ -7,9 +7,9 @@ import torch
 import os
 import json
 
-data_filepath = '../data/data-llama13b.json'
-tokenizer_filepath = "/root/autodl-tmp/llama2/large/model"
-model_filepath = "/root/autodl-tmp/llama2/large/model"
+data_filepath = '../data/data-llama7b.json'
+tokenizer_filepath = "/root/autodl-tmp/llama2/base/model"
+model_filepath = "/root/autodl-tmp/llama2/base/model"
 
 adv_prompt_responses = {}
 nonadv_prompt_responses = {}
@@ -87,54 +87,56 @@ def prompt_tokens_ie_score(model, tokenizer, prompt, intervene_token):
 tokenizer = AutoTokenizer.from_pretrained(
     tokenizer_filepath, 
     # torch_dtype=torch.float16, 
-    device_map="auto"
+    # device_map="auto"
 )
 model = AutoModelForCausalLM.from_pretrained(
     model_filepath, 
     # torch_dtype=torch.float16, 
-    device_map="auto"
+    # device_map="auto"
 )
 
 # Check if a CUDA-enabled GPU is available
-# torch.cuda.set_device(0) # Use GPU 1
-# device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+torch.cuda.set_device(0) # Use GPU 0
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # Move the model to half precision and then to the appropriate device
-# if torch.cuda.is_available():
-#    model.half()
-#
-torch.cuda.memory_summary
-torch.cuda.memory_allocated
-model.parameters()
+if torch.cuda.is_available():
+   model.half()
 
+# model.parameters()
 model.eval()
-# model.to(device)
+model.to(device)
 
 # model.half()
 # model.to("cuda")
 
-# for i in range(len(nonadv_prompts)):
+for i in range(len(nonadv_prompts)):
     
-#     # inputs 
-#     inputs = tokenizer(nonadv_prompts[i], return_tensors="pt").to("cuda")
+    # inputs 
+    inputs = tokenizer(nonadv_prompts[i], return_tensors="pt").to("cuda")
 
-#     ## response
-#     outputs = model.generate(**inputs)
-#     generated_text = tokenizer.decode(outputs[0], skip_special_tokens=True)
-#     print(f'Harmful prompt {i}: {nonadv_prompts[i]}, ', generated_text)
+    ## response
+    # outputs = model.generate(**inputs)
+    # generated_text = tokenizer.decode(outputs[0], skip_special_tokens=True)
+    # print(f'Harmful prompt {i}: {nonadv_prompts[i]}, ', generated_text)
 
-#     ## prompt logits with intervened token
-#     prompt_tokens_ie_list, prompt_tokens_logits_list = prompt_tokens_ie_score(model, tokenizer, nonadv_prompts[i], '-')
+    ## prompt logits with intervened token
+    prompt_tokens_ie_list, prompt_tokens_logits_list = prompt_tokens_ie_score(model, tokenizer, nonadv_prompts[i], '-')
 
-#     nonadv_prompt_responses[nonadv_prompts[i]] = {'response': generated_text}
-#     nonadv_prompt_responses[nonadv_prompts[i]]['prompt_ie_score'] = prompt_tokens_ie_list
-#     nonadv_prompt_responses[nonadv_prompts[i]]['prompt_logits'] = prompt_tokens_logits_list
+    # nonadv_prompt_responses[nonadv_prompts[i]] = {'response': generated_text}
+    # nonadv_prompt_responses[nonadv_prompts[i]]['prompt_ie_score'] = prompt_tokens_ie_list
+    # nonadv_prompt_responses[nonadv_prompts[i]]['prompt_logits'] = prompt_tokens_logits_list
     
-#     # print(nonadv_prompt_responses)
-#     with open('nonadv_data_w_scores_3.json', 'w') as json_file:
-#         json.dump(nonadv_prompt_responses, json_file, indent=4)   
+    nonadv_prompt_responses[nonadv_prompts[i]]= {
+            'prompt_ie_score': prompt_tokens_ie_list, 
+            'prompt_logits' : prompt_tokens_logits_list
+            }
 
-#     print('\n\n saved response')
+    # print(nonadv_prompt_responses)
+    with open('nonadv_data_w_scores_3_7b.json', 'w') as json_file:
+        json.dump(nonadv_prompt_responses, json_file, indent=4)   
+
+    print('\n\n saved response')
 
 
 for i in range(len(adv_prompts)):
@@ -158,9 +160,9 @@ for i in range(len(adv_prompts)):
             }
     print(f'iteration {i}')
     # print(adv_prompt_responses)
-    with open('adv_data_w_scores_3.json', 'w') as json_file:
+    with open('adv_data_w_scores_3_7b.json', 'w') as json_file:
         json.dump(adv_prompt_responses, json_file, indent=4)  
 
     print('\n\n saved response') 
     torch.cuda.empty_cache()
-    torch.cuda.memory_summary()
+    # torch.cuda.memory_summary()
