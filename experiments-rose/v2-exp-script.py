@@ -85,15 +85,27 @@ def prompt_tokens_ie_score(model, tokenizer, prompt, intervene_token):
 
 ## load model 
 tokenizer = AutoTokenizer.from_pretrained(
-    tokenizer_filepath, torch_dtype=torch.float16, 
-    device_map="auto"
+    tokenizer_filepath, 
+    # torch_dtype=torch.float16, 
+    # device_map="auto"
 )
 model = AutoModelForCausalLM.from_pretrained(
-    model_filepath, torch_dtype=torch.float16, 
-    device_map="auto"
+    model_filepath, 
+    # torch_dtype=torch.float16, 
+    # device_map="auto"
 )
 
+# Check if a CUDA-enabled GPU is available
+torch.cuda.set_device(1)  # Use GPU 1
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+# Move the model to half precision and then to the appropriate device
+if torch.cuda.is_available():
+    model.half()
+
 model.eval()
+model.to(device)
+
 # model.half()
 # model.to("cuda")
 
@@ -128,14 +140,14 @@ for i in range(len(adv_prompts)):
     inputs.to("cuda")
 
     ## response
-    outputs = model.generate(**inputs)
-    generated_text = tokenizer.decode(outputs[0], skip_special_tokens=True)
-    print(f'adversarial prompt {i}: {adv_prompts[i]}, ', generated_text)
+    # outputs = model.generate(**inputs)
+    # generated_text = tokenizer.decode(outputs[0], skip_special_tokens=True)
+    # print(f'adversarial prompt {i}: {adv_prompts[i]}, ', generated_text)
     
     ## prompt logits with intervened token
     prompt_tokens_ie_list, prompt_tokens_logits_list = prompt_tokens_ie_score(model, tokenizer, adv_prompts[i], '-')
 
-    adv_prompt_responses[adv_prompts[i]] = {'response': generated_text[:100]}
+    # adv_prompt_responses[adv_prompts[i]] = {'response': generated_text[:100]}
     adv_prompt_responses[adv_prompts[i]]['prompt_ie_score'] = prompt_tokens_ie_list
     adv_prompt_responses[adv_prompts[i]]['prompt_logits'] = prompt_tokens_logits_list
     
