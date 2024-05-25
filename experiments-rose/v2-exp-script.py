@@ -17,7 +17,7 @@ nonadv_prompt_responses = {}
 with open(data_filepath, 'r') as file:
         data = json.load(file)
 adv_prompts = data['adv_data'][:50]
-nonadv_prompts = data['non_adv_data']
+# nonadv_prompts = data['non_adv_data']
 
 ### function for next token logits 
 def predict_next_token(model, inp):
@@ -110,33 +110,33 @@ model.to(device)
 # model.half()
 # model.to("cuda")
 
-for i in range(len(nonadv_prompts)):
+# for i in range(len(nonadv_prompts)):
     
-    # inputs 
-    inputs = tokenizer(nonadv_prompts[i], return_tensors="pt").to("cuda")
+#     # inputs 
+#     inputs = tokenizer(nonadv_prompts[i], return_tensors="pt").to("cuda")
 
-    ## response
-    # outputs = model.generate(**inputs)
-    # generated_text = tokenizer.decode(outputs[0], skip_special_tokens=True)
-    # print(f'Harmful prompt {i}: {nonadv_prompts[i]}, ', generated_text)
+#     ## response
+#     # outputs = model.generate(**inputs)
+#     # generated_text = tokenizer.decode(outputs[0], skip_special_tokens=True)
+#     # print(f'Harmful prompt {i}: {nonadv_prompts[i]}, ', generated_text)
 
-    ## prompt logits with intervened token
-    prompt_tokens_ie_list, prompt_tokens_logits_list = prompt_tokens_ie_score(model, tokenizer, nonadv_prompts[i], '-')
+#     ## prompt logits with intervened token
+#     prompt_tokens_ie_list, prompt_tokens_logits_list = prompt_tokens_ie_score(model, tokenizer, nonadv_prompts[i], '-')
 
-    # nonadv_prompt_responses[nonadv_prompts[i]] = {'response': generated_text}
-    # nonadv_prompt_responses[nonadv_prompts[i]]['prompt_ie_score'] = prompt_tokens_ie_list
-    # nonadv_prompt_responses[nonadv_prompts[i]]['prompt_logits'] = prompt_tokens_logits_list
+#     # nonadv_prompt_responses[nonadv_prompts[i]] = {'response': generated_text}
+#     # nonadv_prompt_responses[nonadv_prompts[i]]['prompt_ie_score'] = prompt_tokens_ie_list
+#     # nonadv_prompt_responses[nonadv_prompts[i]]['prompt_logits'] = prompt_tokens_logits_list
     
-    nonadv_prompt_responses[nonadv_prompts[i]]= {
-            'prompt_ie_score': prompt_tokens_ie_list, 
-            'prompt_logits' : prompt_tokens_logits_list
-            }
+#     nonadv_prompt_responses[nonadv_prompts[i]]= {
+#             'prompt_ie_score': prompt_tokens_ie_list, 
+#             'prompt_logits' : prompt_tokens_logits_list
+#             }
 
-    # print(nonadv_prompt_responses)
-    with open('nonadv_data_w_scores_3_7b.json', 'w') as json_file:
-        json.dump(nonadv_prompt_responses, json_file, indent=4)   
+#     # print(nonadv_prompt_responses)
+#     with open('nonadv_data_w_scores_3_7b.json', 'w') as json_file:
+#         json.dump(nonadv_prompt_responses, json_file, indent=4)   
 
-    print('\n\n saved response')
+#     print('\n\n saved response')
 
 
 for i in range(len(adv_prompts)):
