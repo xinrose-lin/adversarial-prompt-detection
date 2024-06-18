@@ -6,6 +6,7 @@ with open("autodan_hga/llama2_0_normal.json", 'r') as f:
 def filter_goal_and_target(original_dict):
     filtered_dict = {}
     for key, value in original_dict.items():
+        # following autodan code repo: utils/string_utils.py line 28
         final_suffix = value['final_suffix'].replace('[REPLACE]', value['goal'].lower())
         filtered_dict[key] = {
             'goal': value['goal'],
